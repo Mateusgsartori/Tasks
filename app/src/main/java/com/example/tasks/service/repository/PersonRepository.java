@@ -87,7 +87,19 @@ public class PersonRepository {
     }
 
     public void saveUserData(PersonModel model) {
+        this.mSecurityPreferences.storeString(TaskConstants.SHARED.TOKEN_KEY, model.getToken());
+        this.mSecurityPreferences.storeString(TaskConstants.SHARED.PERSON_KEY, model.getPersonKey());
+        this.mSecurityPreferences.storeString(TaskConstants.SHARED.PERSON_NAME, model.getName());
 
+    }
+
+    public PersonModel getUserData() {
+        PersonModel personModel = new PersonModel();
+        personModel.setName(this.mSecurityPreferences.getStoredString(TaskConstants.SHARED.PERSON_NAME));
+        personModel.setPersonKey(this.mSecurityPreferences.getStoredString(TaskConstants.SHARED.PERSON_KEY));
+        personModel.setToken(this.mSecurityPreferences.getStoredString(TaskConstants.SHARED.TOKEN_KEY));
+
+        return personModel;
     }
 
 }
