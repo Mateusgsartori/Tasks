@@ -30,7 +30,7 @@ public class LoginViewModel extends AndroidViewModel {
     public LoginViewModel(@NonNull Application application) {
         super(application);
         this.mPersonRepository = new PersonRepository(application);
-        this.mPriorityRepository = new PriorityRepository();
+        this.mPriorityRepository = new PriorityRepository(application);
     }
 
     public void login(String email, String password) {
@@ -61,7 +61,7 @@ public class LoginViewModel extends AndroidViewModel {
             this.mPriorityRepository.all(new APIListener<List<PriorityModel>>() {
                 @Override
                 public void onSuccess(List<PriorityModel> result) {
-                    String s = "";
+                    mPriorityRepository.save(result);
                 }
 
                 @Override

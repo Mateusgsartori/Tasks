@@ -15,35 +15,35 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class PersonRepository {
+public class PersonRepository extends BaseRepository{
 
     private PersonService mPersonService;
     private SecurityPreferences mSecurityPreferences;
-    private Context mContext;
 
     public PersonRepository(Context context) {
+        super(context);
         this.mPersonService = RetrofitClient.createService(PersonService.class);
         this.mSecurityPreferences = new SecurityPreferences(context);
         this.mContext = context;
 
     }
 
-    public void create(String name, String email, String password) {
+    public void create(String name, String email, String password, APIListener<PersonModel> listener) {
         Call<PersonModel> call = this.mPersonService.create(name, email, password);
         call.enqueue(new Callback<PersonModel>() {
             @Override
             public void onResponse(Call<PersonModel> call, Response<PersonModel> response) {
-                Response<PersonModel> personModelResponse = response;
-                PersonModel personModel =  personModelResponse.body();
-                int codigo = personModelResponse.code();
+               if (response.code() == TaskConstants.HTTP.SUCCESS) {
+                   listener.onSuccess(response.body());
+               } else {
 
-                String s="";
+               }
 
             }
 
             @Override
             public void onFailure(Call<PersonModel> call, Throwable t) {
-                String s="";
+                listener.onFailure(mContext.getString(R.string.ERROR_UNEXPECTED));
 
             }
         });
@@ -64,18 +64,9 @@ public class PersonRepository {
                 if (personModelResponse.code() == TaskConstants.HTTP.SUCCESS){
                     listener.onSuccess(personModel);
                 } else {
-                    try{
-                        String json = personModelResponse.errorBody().string();
-                        String str = new Gson().fromJson(json, String.class);
-                        listener.onFailure(str);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                  listener.onFailure(handleFailure(response.errorBody()));
 
                 }
-
-
-
             }
 
             @Override
